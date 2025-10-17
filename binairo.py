@@ -24,6 +24,16 @@ class BinairoGame:
                     new_row.append(int(s)) # Appending value onto the row - must be an Integer 
             grid.append(new_row)
         return grid
+    def print_grid_with_constraints(grid, horizontal_constraints, vertical_constraints):
+        N = len(grid)
+        for r in range(N): # for each row in the grid
+            row_str = "" # initialise an empty string
+            for c in range(N): # for each column in the grid
+                row_str = row_str + str(grid[r][c]) if grid[r][c] is not None else "."
+                
+
+        
+        return 0
 
 
 # Step 1: Load puzzle
