@@ -4,7 +4,29 @@ from tkinter import filedialog, messagebox
 import json
 
 
-class BinairoGame:
+class BinairoLogic:
+    def __init__(self, game):
+        self.game = game
+
+    def next_adj_rule(self):
+        grid = self.game.grid
+        h_constraints = self.game.h_constraints
+        v_constraints = self.game.v_constraints
+
+        N = len(grid)
+        for c in range(N):
+            for r in range(N-2):
+                cell1 = grid[r][c]
+                cell2 = grid[r+1][c]
+                cell3 = grid[r+2][c]
+                constr_12 = h_constraints[r][c]             # constraint between cell1 and cell2
+                constr_23 = h_constraints[r][c+1]           # constraint between cell2 and cell3
+
+
+
+
+    
+class BinairoPrint:
     @staticmethod
     def load_puzzle(file_path):
         with open(file_path, 'r') as file:
@@ -56,5 +78,5 @@ class BinairoGame:
         print()
 
 # Step 1: Load puzzle
-puzzle = BinairoGame.load_puzzle("puzzles/puzzle1.json")
-BinairoGame.print_grid_with_rules(puzzle)
+puzzle = BinairoPrint.load_puzzle("puzzles/puzzle1.json")
+BinairoPrint.print_grid_with_rules(puzzle)
