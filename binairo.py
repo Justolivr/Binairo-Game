@@ -8,74 +8,113 @@ class BinairoLogic:
     def __init__(self, game):
         self.game = game
 
-    def next_adj_rule(self):
+    def apply_adjacent_rules(self): # this applies every adjacent rule for the binairo
+
         grid = self.game.grid
         h_constraints = self.game.h_constraints
         v_constraints = self.game.v_constraints
-        N = self.game.N
+        N = self.game.N # size of the grid
+        changed = False # flag to track if any changes were made
 
-        changed = False
-
+        # -----------------------------
         # Horizontal checks
+        # -----------------------------
         for r in range(N):
-            for c in range(N-2):
-                cell1 = grid[r][c]
-                cell2 = grid[r][c+1]
-                cell3 = grid[r][c+2]
-                constr_12 = h_constraints[r][c]             # constraint between cell1 and cell2
-                constr_23 = h_constraints[r][c+1]           # constraint between cell2 and cell3
+            for c in range(N - 2):
+                cell1, cell2, cell3 = grid[r][c], grid[r][c+1], grid[r][c+2] # initialise 3 consecutive cells
+                cons12, cons23 = h_constraints[r][c], h_constraints[r][c+1] # initialise the constraints between them (1-2 and 2-3)
 
-                # Forward checking
+                # Forward check : first two cells known
                 if cell1 is not None and cell2 is not None and cell3 is None:
-                    if constr_23 != ".":  # checks if there is a constraint
-                        if constr_23 == "=":   # if there is a = constraint between cell2 and cell3
-                            grid[r][c+2] = cell2 # adj cell must be the same as the first cell
-                        elif constr_23 == "x": # if there is a x constraint betwwen cell2 and cell3
-                            grid[r][c+2] = 1 - cell2 # if cell2 is 0, grid[r][c+2] = 1; if cell2 is 1, then grid[r][c+2] = 0
-                        changed = True
-                        print(f"H Fill: grid[{r}][{c+2}] set to {grid[r][c+2]}")
+                    if cons23 != ".": # if there is a constraint between cell2 and cell3
+                        if cons23 == "=":
+                            grid[r][c+2] = cell2
+                        elif cons23 == "x":
+                            grid[r][c+2] = 1 - cell2
+                        changed = True 
+                        print(f"H Fill: grid[{r}][{c+2}] = {grid[r][c+2]}")
 
-                # Backward checking
+                # Backward check: last two cells known
                 if cell1 is None and cell2 is not None and cell3 is not None:
-                    if constr_12 != ".":
-                        if constr_12 == "=":
+                    if cons12 != ".":
+                        if cons12 == "=":
                             grid[r][c] = cell2
-                        elif constr_12 == "x":
+                        elif cons12 == "x":
                             grid[r][c] = 1 - cell2
                         changed = True
-                        print(f"H Fill: grid[{r}][{c}] set to {grid[r][c]}")
-        # Vertical check            
-        for c in range(N):
-            for r in range(N-2):
-                cell1 = grid[r][c]
-                cell2 = grid[r+1][c]
-                cell3 = grid[r+2][c]
-                constr_12 = v_constraints[r][c]
-                constr_23 = v_constraints[r+1][c]
+                        print(f"H Fill: grid[{r}][{c}] = {grid[r][c]}")
 
-                # Forward checking
+                # One known at front, two empty cells
+                if cell1 is not None and cell2 is None and cell3 is None:
+                    if cons12 != ".":
+                        if cons12 == "=":
+                            grid[r][c+1] = cell1
+                        elif cons12 == "x":
+                            grid[r][c+1] = 1 - cell1
+                        changed = True
+                        print(f"H Fill (1→2 empty): grid[{r}][{c+1}] = {grid[r][c+1]}")
+
+                # One known at end, two empty cells
+                if cell1 is None and cell2 is None and cell3 is not None:
+                    if cons23 != ".":
+                        if cons23 == "=":
+                            grid[r][c+1] = cell3
+                        elif cons23 == "x":
+                            grid[r][c+1] = 1 - cell3
+                        changed = True
+                        print(f"H Fill (1→2 empty): grid[{r}][{c+1}] = {grid[r][c+1]}")
+
+        # -----------------------------
+        # Vertical checks
+        # -----------------------------
+        for c in range(N):
+            for r in range(N - 2):
+                cell1, cell2, cell3 = grid[r][c], grid[r+1][c], grid[r+2][c]
+                cons12, cons23 = v_constraints[r][c], v_constraints[r+1][c]
+
+                # Forward check: first two cells known
                 if cell1 is not None and cell2 is not None and cell3 is None:
-                    if constr_23 != ".":
-                        if constr_23 == "=":
+                    if cons23 != ".":
+                        if cons23 == "=":
                             grid[r+2][c] = cell2
-                        elif constr_23 == "x":
+                        elif cons23 == "x":
                             grid[r+2][c] = 1 - cell2
                         changed = True
-                        print(f"V Fill: grid[{r+2}][{c}] set to {grid[r+2][c]}")
-                    
+                        print(f"V Fill: grid[{r+2}][{c}] = {grid[r+2][c]}")
+
+                # Backward check: last two cells known
                 if cell1 is None and cell2 is not None and cell3 is not None:
-                    if constr_12 != ".":
-                        if constr_12 == "=":
+                    if cons12 != ".":
+                        if cons12 == "=":
                             grid[r][c] = cell2
-                        elif constr_12 == "x":
+                        elif cons12 == "x":
                             grid[r][c] = 1 - cell2
                         changed = True
-                        print(f"V Fill: grid[{r}][{c}] set to {grid[r][c]}")
+                        print(f"V Fill: grid[{r}][{c}] = {grid[r][c]}")
+
+                # One known at front, two empty cells
+                if cell1 is not None and cell2 is None and cell3 is None:
+                    if cons12 != ".":
+                        if cons12 == "=":
+                            grid[r+1][c] = cell1
+                        elif cons12 == "x":
+                            grid[r+1][c] = 1 - cell1
+                        changed = True
+                        print(f"V Fill (1→2 empty): grid[{r+1}][{c}] = {grid[r+1][c]}")
+
+                # One known at end, two empty cells
+                if cell1 is None and cell2 is None and cell3 is not None:
+                    if cons23 != ".":
+                        if cons23 == "=":
+                            grid[r+1][c] = cell3
+                        elif cons23 == "x":
+                            grid[r+1][c] = 1 - cell3
+                        changed = True
+                        print(f"V Fill (1→2 empty): grid[{r+1}][{c}] = {grid[r+1][c]}")
 
         return changed
-    def solve_steps(self):
-        return self.next_adj_rule()
-            
+
+
 
         
 
@@ -152,8 +191,7 @@ print("Initial puzzle:")
 game.print_grid_with_rules()
 
 # Step 4: Apply logic
-changed = solver.next_adj_rule()  # note: call it as a function
-changed = solver.next_adj_rule()  # note: call it as a function
+changed = solver.apply_adjacent_rules()  # note: call it as a function
 if changed:
     print("After step (changes applied):")
 else:
