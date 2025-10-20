@@ -24,37 +24,46 @@ class BinairoGame:
                     new_row.append(int(s)) # Appending value onto the row - must be an Integer 
             grid.append(new_row)
         return grid
-    def print_grid_with_constraints(grid, horizontal_constraints, vertical_constraints):
-        N = len(grid)
-        for r in range(N): # for each row in the grid
-            row_str = "" # initialise an empty string
-            for c in range(N): # for each column in the grid
-                if grid[r][c] is not None:
-                    row_str += str(grid[r][c])
-                else:
-                    row_str += "."
-                if c < N-1:
-                    if horizontal_constraints[r][c] is not None:
-                        row_str += horizontal_constraints[r][c]
-                    else:
-                        row_str += ""
-                print(row_str)
-            
-            if r < N-1:
-                col_str = ""
-                for c in range(N):
-                    if vertical_constraints[r][c] is not None:
-                        col_str += vertical_constraints[r][c]
-                    else:
-                        col_str += ""
-                    if c < N-1:
-                        col_str += " "
-                print(col_str)    
-
-                
-
+    def print_grid_with_constraints(grid, h_constraints, v_constraints):
+        def format_constraint(c, vertical=False):
+            if not c:
+                return " "
+            if c == "=":
+                return "‖" if vertical else "="
+            if c == "x":
+                return "⊗" if vertical else "x"
+            return c
         
-        return 0
+        N = len(grid)
+        cell_w = 3
+
+        print("    " + " ".join([f"{i:^{cell_w}}" for i in range(N)]))
+        print("  " + "┌" + "┬".join(["─" * cell_w for _ in range(N)]) + "┐")
+
+        for r in range(N):
+            # row of cells + horizontal constraints
+            row_str = f"{r} │"
+            for c in range(N):
+                val = str(grid[r][c]) if grid[r][c] is not None else "."
+                row_str += f"{val:^{cell_w}}"
+                if c < N - 1:
+                    h = h_constraints[r][c] if h_constraints[r][c] else " "
+                    row_str += f"{h:^{cell_w}}"
+            row_str += "│"
+            print(row_str)
+
+            # row of vertical constraints
+            if r < N - 1:
+                v_row = "  │"
+                for c in range(N):
+                    v = v_constraints[r][c] if v_constraints[r][c] else " "
+                    v_row += f"{v:^{cell_w}}"
+                    if c < N - 1:
+                        v_row += " " * cell_w
+                v_row += "│"
+                print(v_row)
+
+        print("  " + "└" + "┴".join(["─" * cell_w for _ in range(N)]) + "┘")
 
 
 # Step 1: Load puzzle
