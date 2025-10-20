@@ -29,7 +29,28 @@ class BinairoGame:
         for r in range(N): # for each row in the grid
             row_str = "" # initialise an empty string
             for c in range(N): # for each column in the grid
-                row_str = row_str + str(grid[r][c]) if grid[r][c] is not None else "."
+                if grid[r][c] is not None:
+                    row_str += str(grid[r][c])
+                else:
+                    row_str += "."
+                if c < N-1:
+                    if horizontal_constraints[r][c] is not None:
+                        row_str += horizontal_constraints[r][c]
+                    else:
+                        row_str += ""
+                print(row_str)
+            
+            if r < N-1:
+                col_str = ""
+                for c in range(N):
+                    if vertical_constraints[r][c] is not None:
+                        col_str += vertical_constraints[r][c]
+                    else:
+                        col_str += ""
+                    if c < N-1:
+                        col_str += " "
+                print(col_str)    
+
                 
 
         
@@ -41,10 +62,15 @@ puzzle = BinairoGame.load_puzzle("puzzles/puzzle1.json")
 
 # Step 2: Convert grid symbols into Python values
 grid = BinairoGame.convert_grid(puzzle["grid"])
+horizontal_constraints = puzzle["horizontal_constraints"]
+vertical_constraints = puzzle["vertical_constraints"]
+
+BinairoGame.print_grid_with_constraints(grid, horizontal_constraints, vertical_constraints)
+
 
 # Step 3: Print information
-print("Puzzle name:", puzzle["name"])
-print("Grid:")
+print("\nPuzzle name:", puzzle["name"])
+print("Grid:\n")
 for row in grid:
     display_row = [str(x) if x is not None else "." for x in row]
     print(" ".join(display_row))
