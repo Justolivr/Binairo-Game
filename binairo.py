@@ -25,15 +25,6 @@ class BinairoGame:
             grid.append(new_row)
         return grid
     def print_grid_with_constraints(grid, h_constraints, v_constraints):
-        def format_constraint(c, vertical=False):
-            if not c:
-                return " "
-            if c == "=":
-                return "‖" if vertical else "="
-            if c == "x":
-                return "⊗" if vertical else "x"
-            return c
-        
         N = len(grid)
         cell_w = 3
 
