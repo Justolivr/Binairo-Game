@@ -215,7 +215,7 @@ class BinairoGame:
         print()
 
 # Step 1: Load puzzle as dictionary
-puzzle_data = BinairoGame.load_puzzle("puzzles/puzzle1.json")
+puzzle_data = BinairoGame.load_puzzle("puzzles/puzzle2.json")
 
 # Step 2: Create a BinairoGame instance
 game = BinairoGame(puzzle_data)
