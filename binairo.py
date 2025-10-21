@@ -153,6 +153,57 @@ class BinairoLogic:
                     changed = True
                     print(f"Column fill: grid[{r}][{c}] = 0")
         return changed
+    
+    def check_for_triple(self):
+        changed = False
+        N = self.game.N
+        grid = self.game.grid
+    
+        
+        for r in range(N):
+            for c in range(N-2):
+                cells= [grid[r][c], grid[r][c+1],grid[r][c+2]]
+                # Pattern 1: X X .
+                if cells[0] is not None and cells[1] == cells[0] and cells[2] is None:
+                    grid[r][c+2] = 1 - cells[0]
+                    changed = True
+                    print(f"Row {r}: grid[{r}][{c+2}] = {grid[r][c+2]} (no three rule)")
+
+                # Pattern 2: . X X
+                if cells[2] is not None and cells[1] == cells[2] and cells[0] is None:
+                    grid[r][c] = 1 - cells[2]
+                    changed = True
+                    print(f"Row {r}: grid[{r}][{c}] = {grid[r][c]} (no three rule)")
+
+                # Pattern 3: X . X
+                if cells[0] is not None and cells[2] == cells[0] and cells[1] is None:
+                    grid[r][c+1] = 1 - cells[0]
+                    changed = True
+                    print(f"Row {r}: grid[{r}][{c+1}] = {grid[r][c+1]} (no three rule)")
+        
+        for c in range(N):
+            for r in range(N - 2):
+                cells = [grid[r][c], grid[r+1][c], grid[r+2][c]]
+
+                # Pattern 1: X X .
+                if cells[0] is not None and cells[1] == cells[0] and cells[2] is None:
+                    grid[r+2][c] = 1 - cells[0]
+                    changed = True
+                    print(f"Col {c}: grid[{r+2}][{c}] = {grid[r+2][c]} (no three rule)")
+
+                # Pattern 2: . X X
+                if cells[2] is not None and cells[1] == cells[2] and cells[0] is None:
+                    grid[r][c] = 1 - cells[2]
+                    changed = True
+                    print(f"Col {c}: grid[{r}][{c}] = {grid[r][c]} (no three rule)")
+
+                # Pattern 3: X . X
+                if cells[0] is not None and cells[2] == cells[0] and cells[1] is None:
+                    grid[r+1][c] = 1 - cells[0]
+                    changed = True
+                    print(f"Col {c}: grid[{r+1}][{c}] = {grid[r+1][c]} (no three rule)")
+
+        return changed
 
 class BinairoGame:
     def __init__(self, puzzle_data):
@@ -227,6 +278,8 @@ while True:
 
     # Apply equal number rule
     changed |= solver.apply_equal_number_rule()
+
+    changed |= solver.check_for_triple()
 
     if not changed:
         # No more changes possible, stop iterating
