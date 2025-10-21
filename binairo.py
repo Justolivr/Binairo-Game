@@ -113,18 +113,47 @@ class BinairoLogic:
                         print(f"V Fill (1→2 empty): grid[{r+1}][{c}] = {grid[r+1][c]}")
 
         return changed
-
-
-
-        
-
-
-
-                
-
-
-
     
+    def apply_equal_number_rule(self):
+        changed = False
+        N = self.game.N
+        grid = self.game.grid
+
+        for r in range(N):
+            row = grid[r]
+            n_zero = row.count(0)
+            n_one = row.count(1)
+            e_cells = [c for c, val in enumerate(row) if val is None]
+
+            if n_zero == N/2:
+                for c in e_cells:
+                    row[c] = 1
+                    changed = True
+                    print(f"Row fill: grid[{r}][{c}] = 1")
+            elif n_one == N/2:
+                for c in e_cells:
+                    row[c] = 0
+                    changed = True
+                    print(f"Row fill: grid[{r}][{c}] = 0")
+
+        for c in range(N):
+            col = [grid[r][c] for r in range(N)]
+            n_zero = col.count(0)
+            n_one = col.count(1)
+            e_cells = [r for r, val in enumerate(col) if val is None]
+
+            if n_zero == N/2:
+                for r in e_cells:
+                    grid[r][c] = 1
+                    changed = True
+                    print(f"Column fill: grid[{r}][{c}] = 1")
+            elif n_one == N/2:
+                for r in e_cells:
+                    grid[r][c] = 0
+                    changed = True
+                    print(f"Column fill: grid[{r}][{c}] = 0")
+        return changed
+
 class BinairoGame:
     def __init__(self, puzzle_data):
         self.name = puzzle_data["name"]
@@ -177,7 +206,6 @@ class BinairoGame:
                     print(f"Cols {c}, rows {r}-{r+1}: {val}")
         print()
 
-# Step 1: Load puzzle
 # Step 1: Load puzzle as dictionary
 puzzle_data = BinairoGame.load_puzzle("puzzles/puzzle1.json")
 
@@ -190,14 +218,21 @@ solver = BinairoLogic(game)
 print("Initial puzzle:")
 game.print_grid_with_rules()
 
-# Step 4: Apply logic
-changed = solver.apply_adjacent_rules()  # note: call it as a function
-if changed:
-    print("After step (changes applied):")
-else:
-    print("After step (no changes):")
+# Step 4: Apply logic iteratively
+while True:
+    changed = False
 
-print("After applying logic step:")
+    # Apply adjacent rules
+    changed |= solver.apply_adjacent_rules()
+
+    # Apply equal number rule
+    changed |= solver.apply_equal_number_rule()
+
+    if not changed:
+        # No more changes possible, stop iterating
+        break
+
+print("After applying logic (final state):")
 game.print_grid_with_rules()
 
 
