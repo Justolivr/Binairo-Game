@@ -8,109 +8,66 @@ class BinairoLogic:
     def __init__(self, game):
         self.game = game
 
-    def apply_adjacent_rules(self): # this applies every adjacent rule for the binairo
-
+    def apply_adjacent_rules(self):
+        changed = False
         grid = self.game.grid
+        N = self.game.N
         h_constraints = self.game.h_constraints
         v_constraints = self.game.v_constraints
-        N = self.game.N # size of the grid
-        changed = False # flag to track if any changes were made
 
-        # -----------------------------
-        # Horizontal checks
-        # -----------------------------
+        # --- Horizontal constraints ---
         for r in range(N):
-            for c in range(N - 2):
-                cell1, cell2, cell3 = grid[r][c], grid[r][c+1], grid[r][c+2] # initialise 3 consecutive cells
-                cons12, cons23 = h_constraints[r][c], h_constraints[r][c+1] # initialise the constraints between them (1-2 and 2-3)
+            for c in range(N - 1):
+                cell1, cell2 = grid[r][c], grid[r][c + 1]
+                cons = h_constraints[r][c]
 
-                # Forward check : first two cells known
-                if cell1 is not None and cell2 is not None and cell3 is None:
-                    if cons23 != ".": # if there is a constraint between cell2 and cell3
-                        if cons23 == "=":
-                            grid[r][c+2] = cell2
-                        elif cons23 == "x":
-                            grid[r][c+2] = 1 - cell2
-                        changed = True 
-                        print(f"H Fill: grid[{r}][{c+2}] = {grid[r][c+2]}")
-
-                # Backward check: last two cells known
-                if cell1 is None and cell2 is not None and cell3 is not None:
-                    if cons12 != ".":
-                        if cons12 == "=":
-                            grid[r][c] = cell2
-                        elif cons12 == "x":
-                            grid[r][c] = 1 - cell2
+                if cons == "x":
+                    # Must be opposite
+                    if cell1 is not None and cell2 is None:
+                        grid[r][c + 1] = 1 - cell1
                         changed = True
-                        print(f"H Fill: grid[{r}][{c}] = {grid[r][c]}")
-
-                # One known at front, two empty cells
-                if cell1 is not None and cell2 is None and cell3 is None:
-                    if cons12 != ".":
-                        if cons12 == "=":
-                            grid[r][c+1] = cell1
-                        elif cons12 == "x":
-                            grid[r][c+1] = 1 - cell1
+                        print(f"H Fill (x): grid[{r}][{c+1}] = {grid[r][c+1]}")
+                    elif cell2 is not None and cell1 is None:
+                        grid[r][c] = 1 - cell2
                         changed = True
-                        print(f"H Fill (1→2 empty): grid[{r}][{c+1}] = {grid[r][c+1]}")
+                        print(f"H Fill (x): grid[{r}][{c}] = {grid[r][c]}")
 
-                # One known at end, two empty cells
-                if cell1 is None and cell2 is None and cell3 is not None:
-                    if cons23 != ".":
-                        if cons23 == "=":
-                            grid[r][c+1] = cell3
-                        elif cons23 == "x":
-                            grid[r][c+1] = 1 - cell3
+                elif cons == "=":
+                    # Must be the same
+                    if cell1 is not None and cell2 is None:
+                        grid[r][c + 1] = cell1
                         changed = True
-                        print(f"H Fill (1→2 empty): grid[{r}][{c+1}] = {grid[r][c+1]}")
+                        print(f"H Fill (=): grid[{r}][{c+1}] = {grid[r][c+1]}")
+                    elif cell2 is not None and cell1 is None:
+                        grid[r][c] = cell2
+                        changed = True
+                        print(f"H Fill (=): grid[{r}][{c}] = {grid[r][c]}")
 
-        # -----------------------------
-        # Vertical checks
-        # -----------------------------
+        # --- Vertical constraints ---
         for c in range(N):
-            for r in range(N - 2):
-                cell1, cell2, cell3 = grid[r][c], grid[r+1][c], grid[r+2][c]
-                cons12, cons23 = v_constraints[r][c], v_constraints[r+1][c]
+            for r in range(N - 1):
+                cell1, cell2 = grid[r][c], grid[r + 1][c]
+                cons = v_constraints[r][c]
 
-                # Forward check: first two cells known
-                if cell1 is not None and cell2 is not None and cell3 is None:
-                    if cons23 != ".":
-                        if cons23 == "=":
-                            grid[r+2][c] = cell2
-                        elif cons23 == "x":
-                            grid[r+2][c] = 1 - cell2
+                if cons == "x":
+                    if cell1 is not None and cell2 is None:
+                        grid[r + 1][c] = 1 - cell1
                         changed = True
-                        print(f"V Fill: grid[{r+2}][{c}] = {grid[r+2][c]}")
+                        print(f"V Fill (x): grid[{r+1}][{c}] = {grid[r+1][c]}")
+                    elif cell2 is not None and cell1 is None:
+                        grid[r][c] = 1 - cell2
+                        changed = True
+                        print(f"V Fill (x): grid[{r}][{c}] = {grid[r][c]}")
 
-                # Backward check: last two cells known
-                if cell1 is None and cell2 is not None and cell3 is not None:
-                    if cons12 != ".":
-                        if cons12 == "=":
-                            grid[r][c] = cell2
-                        elif cons12 == "x":
-                            grid[r][c] = 1 - cell2
+                elif cons == "=":
+                    if cell1 is not None and cell2 is None:
+                        grid[r + 1][c] = cell1
                         changed = True
-                        print(f"V Fill: grid[{r}][{c}] = {grid[r][c]}")
-
-                # One known at front, two empty cells
-                if cell1 is not None and cell2 is None and cell3 is None:
-                    if cons12 != ".":
-                        if cons12 == "=":
-                            grid[r+1][c] = cell1
-                        elif cons12 == "x":
-                            grid[r+1][c] = 1 - cell1
+                        print(f"V Fill (=): grid[{r+1}][{c}] = {grid[r+1][c]}")
+                    elif cell2 is not None and cell1 is None:
+                        grid[r][c] = cell2
                         changed = True
-                        print(f"V Fill (1→2 empty): grid[{r+1}][{c}] = {grid[r+1][c]}")
-
-                # One known at end, two empty cells
-                if cell1 is None and cell2 is None and cell3 is not None:
-                    if cons23 != ".":
-                        if cons23 == "=":
-                            grid[r+1][c] = cell3
-                        elif cons23 == "x":
-                            grid[r+1][c] = 1 - cell3
-                        changed = True
-                        print(f"V Fill (1→2 empty): grid[{r+1}][{c}] = {grid[r+1][c]}")
+                        print(f"V Fill (=): grid[{r}][{c}] = {grid[r][c]}")
 
         return changed
     
