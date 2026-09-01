@@ -275,6 +275,47 @@ class BinairoLogic:
 
         return True
 
+    def count_solutions(self, limit=2):
+        # Count number of valid solutions that exist.
+        self.solve()
+ 
+        if not self.is_valid():
+            return 0
+        if self.is_solved():
+            return 1
+ 
+        N = self.game.N
+        grid = self.game.grid
+ 
+        target = None
+        for r in range(N):
+            for c in range(N):
+                if grid[r][c] is None:
+                    target = (r, c)
+                    break
+            if target:
+                break
+        r, c = target
+ 
+        total = 0
+        for guess in (0, 1):
+            trial_grid = [row.copy() for row in grid]
+            trial_grid[r][c] = guess
+ 
+            trial_game = BinairoGame.__new__(BinairoGame)
+            trial_game.name = self.game.name
+            trial_game.grid = trial_grid
+            trial_game.h_constraints = self.game.h_constraints
+            trial_game.v_constraints = self.game.v_constraints
+            trial_game.N = N
+ 
+            trial_solver = BinairoLogic(trial_game)
+            total += trial_solver.count_solutions(limit - total)
+            if total >= limit:
+                return total
+ 
+        return total
+    
     def solve_with_backtracking(self): # Backtrack if our four rules doesn't produce a distinct board - guess and check remaining empty cells. Returns True if full valid solution is found
         self.solve()
 
